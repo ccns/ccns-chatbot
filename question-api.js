@@ -1,7 +1,7 @@
 const request = require('request')
 const config = require('config')
 
-const api_url = config.get('api_url')
+const api_url = config.get('api_url') || process.env.API_URL
 
 function GetUser(uid, callback) {
   request({
