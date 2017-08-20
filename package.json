@@ -1,0 +1,25 @@
+{
+  "name": "quiz-chatbot-fb",
+  "version": "1.0.0",
+  "description": "quiz chatbot game",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ccns/quiz-chatbot-fb.git"
+  },
+  "author": "Daniel Chen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ccns/quiz-chatbot-fb/issues"
+  },
+  "homepage": "https://github.com/ccns/quiz-chatbot-fb#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "config": "^1.26.2",
+    "express": "^4.15.4",
+    "request": "^2.81.0"
+  }
+}
