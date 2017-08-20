@@ -7,8 +7,8 @@ const api = require('./question-api')
 
 const port = process.env.PORT || 9487;
 
-const verify_token = config.get('verify_token') || process.env.VERIFY_TOKEN;
-const page_token = config.get('page_token') || process.env.PAGE_TOKEN;
+const verify_token = process.env.VERIFY_TOKEN || config.get('verify_token')
+const page_token = process.env.PAGE_TOKEN || config.get('page_token')
 
 const STATE = {
   unknown: -1,
