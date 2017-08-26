@@ -39,9 +39,13 @@ app.post('/', function(req, res) {
 
   var uid = senderId;
   switch(getState(msging)) {
+    case STATE.getstart:
+      var msg = "Hello,歡迎光臨CCNS! 輸入/help查看可用指令!"
+      reply(genMsgText(uid, msg), null);
+      break
     case STATE.command:
       var text = msging.message.text
-      var cmd = text.substr(1)
+      var cmd = text.substr(1).split(' ')
       execCommand(uid, cmd)
       break
     case STATE.menu:
@@ -76,11 +80,11 @@ app.listen(port, function () {
 })
 
 function execCommand(uid, cmd) {
-  switch(cmd) {
+  switch(cmd[0]) {
     case 'help':
       // var msg = "/help\n- 顯示本列表\n/quiz\n- 開始猜謎遊戲"
-      var msg = "/help\n- 顯示本列表"
-      reply(genMsgText(uid, msg), ()=>{});
+      var msg = "/help\n- 顯示本列表\n/random\n- 隨機產生1-100的亂數\n/random m\n- 隨機產生1-m的亂數\n/random n m\n- 隨機產生n-m的亂數"
+      reply(genMsgText(uid, msg), null);
       break
     case 'quiz':
       api.GetUser(uid, (user) => {
@@ -89,6 +93,9 @@ function execCommand(uid, cmd) {
         });
       })
       break
+    case 'random':
+      var msg = "產生亂數: "+getRandomNum(cmd)
+      reply(genMsgText(uid, msg), null);
   }
 }
 
@@ -111,10 +118,13 @@ function getState(msging) {
       }
     } else {
       var msgTxt = msging.message.text
-      if(msgTxt[0]=='/')
-        return STATE.command
+      if(msgTxt)
+        if(msgTxt[0]=='/')
+          return STATE.command
+        else
+          return STATE.plaintext
       else
-        return STATE.plaintext
+        return STATE.sticker
     }
   }
   return STATE.unknown
@@ -154,7 +164,7 @@ function sendQuestion(uid, question) {
                 + '\nB: ' + question.option[1]
                 + '\nC: ' + question.option[2]
                 + '\nD: ' + question.option[3]
-  reply(genMsg(uid, msgTxt, quick_replies),()=>{});
+  reply(genMsg(uid, msgTxt, quick_replies), null);
 }
 
 function genMsg(recipientId, msgTxt, quick_replies) {
@@ -189,7 +199,10 @@ function reply(messageData, callback) {
 
       console.log("Successfully sent generic message with id %s to recipient %s",
         messageId, recipientId);
-      return callback();
+      if (callback)
+        return callback();
+      else
+        return true;
     }
   })
 }
@@ -218,4 +231,15 @@ function genQuestionReplies(uid, question) {
       payload: 'answer.'+question.id+'.3'
     },
   ];
+}
+
+function isundefine(v) { return (typeof v == 'undefined') }
+
+function getRandomNum(cmd) {
+  if( !isundefine(cmd[1]) && !isundefine(cmd[2]) )
+    return parseInt(cmd[1]) + Math.floor(Math.random()*parseInt(cmd[2]))
+  else if( !isundefine(cmd[1]) )
+    return 1+Math.floor(Math.random()*parseInt(cmd[1]))
+  else
+    return 1+Math.floor(Math.random()*100)
 }
