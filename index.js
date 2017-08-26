@@ -50,7 +50,7 @@ app.post('/', function(req, res) {
       break
     case STATE.menu:
       var payload = msging.postback.payload
-      var cmd = payload.split('.')[1]
+      var cmd = payload.split('.')[1].split(' ')
       execCommand(uid, cmd)
       break
     case STATE.answer:
