@@ -237,7 +237,7 @@ function isundefine(v) { return (typeof v == 'undefined') }
 
 function getRandomNum(cmd) {
   if( !isundefine(cmd[1]) && !isundefine(cmd[2]) )
-    return parseInt(cmd[1]) + Math.floor(Math.random()*(parseInt(cmd[2])-parseInt(cmd[1])))
+    return parseInt(cmd[1]) + Math.floor(Math.random()*(parseInt(cmd[2])-parseInt(cmd[1])+1))
   else if( !isundefine(cmd[1]) )
     return 1+Math.floor(Math.random()*parseInt(cmd[1]))
   else
