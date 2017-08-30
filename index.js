@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const request = require('request')
 const config = require('config')
 const api = require('./question-api')
+const dialog = require('./dialog')
 
 const port = process.env.PORT || 9487;
 
@@ -94,8 +95,26 @@ function execCommand(uid, cmd) {
       })
       break
     case 'random':
-      var msg = "產生亂數: "+getRandomNum(cmd)
+      var rand = getRandomNum(cmd);
+      if(rand)
+        var msg = "產生亂數: "+rand
+      else
+        var msg = "無法辨識範圍！"
       reply(genMsgText(uid, msg), null);
+    case 'status':
+      api.GetUser(uid, (user) => {
+        var name = user.name
+        var questions = user.questionStatus
+        var point = user.point
+        var order = user.order
+        var msg = "uid: "+name
+                +"\n分數: "+point
+                +"\n排名: "+order
+        reply(genMsgText(uid, msg), null);
+      })
+      break;
+    default:
+      reply(genMsgText(uid, '沒有這個指令唷'), null);
   }
 }
 
@@ -132,9 +151,9 @@ function getState(msging) {
 
 function sendAns(uid, question, ans, callback) {
   var msg;
-  if(!checkAns(question, ans)) msg = 'You suck!';
+  if(!checkAns(question, ans)) msg = dialog.GetWrong();
   else {
-    msg = 'Good job!';
+    msg = dialog.GetCorrect();
     api.Answer(uid, question, ans);
   }
   reply(genMsgText(uid, msg), callback);
@@ -236,9 +255,9 @@ function genQuestionReplies(uid, question) {
 function isundefine(v) { return (typeof v == 'undefined') }
 
 function getRandomNum(cmd) {
-  if( !isundefine(cmd[1]) && !isundefine(cmd[2]) )
+  if( cmd.length == 3 )
     return parseInt(cmd[1]) + Math.floor(Math.random()*(parseInt(cmd[2])-parseInt(cmd[1])+1))
-  else if( !isundefine(cmd[1]) )
+  else if( cmd.length == 2 )
     return 1+Math.floor(Math.random()*parseInt(cmd[1]))
   else
     return 1+Math.floor(Math.random()*100)
