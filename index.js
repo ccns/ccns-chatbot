@@ -11,7 +11,7 @@ const port = process.env.PORT || 9487;
 const verify_token = process.env.VERIFY_TOKEN || config.get('verify_token')
 const page_token = process.env.PAGE_TOKEN || config.get('page_token')
 
-const quiz_online = process.env.QUIZ_ONLINE || config.get('quiz_online')
+const quiz_online = (process.env.QUIZ_ONLINE || config.get('quiz_online')) == 'true'
 
 const STATE = {
   unknown: -1,
