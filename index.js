@@ -152,21 +152,21 @@ function getState(msging) {
 function sendAns(uid, question, ans, callback) {
   var msg;
   if(!checkAns(question, ans)) {
-    console.log('Wrong!')
+    // console.log('Wrong!')
     msg = dialog.GetWrong();
   }
   else {
-    console.log('Correct!')
+    // console.log('Correct!')
     msg = dialog.GetCorrect();
     api.Answer(uid, question, ans);
   }
-  console.log(msg);
+  // console.log(msg);
   reply(genMsgText(uid, msg), callback);
 }
 
 function checkAns(question, ans) {
-  console.log(question)
-  console.log(ans)
+  // console.log(question)
+  // console.log(ans)
   if(ans != question.answer) return false;
   else return true;
 }
