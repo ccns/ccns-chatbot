@@ -103,11 +103,14 @@ function execCommand(uid, cmd) {
       reply(genMsgText(uid, msg), null);
     case 'status':
       api.GetUser(uid, (user) => {
-        var name = user.name
+        // console.log(user)
+        var uid = user.name
+        var nickname = typeof user.nickname == 'undefined' ? 'Anonymous (未設定暱稱)' : user.nickname
         var questions = user.questionStatus
         var point = user.point
         var order = user.order
-        var msg = "uid: "+name
+        var msg = "uid: "+uid
+                +"\n名稱: "+nickname
                 +"\n分數: "+point
                 +"\n排名: "+order
         reply(genMsgText(uid, msg), null);
