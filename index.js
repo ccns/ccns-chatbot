@@ -151,15 +151,22 @@ function getState(msging) {
 
 function sendAns(uid, question, ans, callback) {
   var msg;
-  if(!checkAns(question, ans)) msg = dialog.GetWrong();
+  if(!checkAns(question, ans)) {
+    console.log('Wrong!')
+    msg = dialog.GetWrong();
+  }
   else {
+    console.log('Correct!')
     msg = dialog.GetCorrect();
     api.Answer(uid, question, ans);
   }
+  console.log(msg);
   reply(genMsgText(uid, msg), callback);
 }
 
 function checkAns(question, ans) {
+  console.log(question)
+  console.log(ans)
   if(ans != question.answer) return false;
   else return true;
 }
@@ -231,22 +238,30 @@ function genQuestionReplies(uid, question) {
   return [
     {
       content_type: 'text',
-      title: 'A: '+option[0],
+      // title: 'A: '+option[0],
+      // title: '（A）',
+      title: '- A -',
       payload: 'answer.'+question.id+'.0'
     },
     {
       content_type: 'text',
-      title: 'B: '+option[1],
+      // title: 'B: '+option[1],
+      // title: '（B）',
+      title: '- B -',
       payload: 'answer.'+question.id+'.1'
     },
     {
       content_type: 'text',
-      title: 'C: '+option[2],
+      // title: 'C: '+option[2],
+      // title: '（C）',
+      title: '- C -',
       payload: 'answer.'+question.id+'.2'
     },
     {
       content_type: 'text',
-      title: 'D: '+option[3],
+      // title: 'D: '+option[3],
+      // title: '（D）',
+      title: '- D -',
       payload: 'answer.'+question.id+'.3'
     },
   ];
