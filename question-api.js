@@ -71,7 +71,7 @@ function GetQuestionById(qid, callback) {
   });
 }
 
-function Answer(uid, question, ans) {
+function Answer(uid, question, ans, callback) {
   request({
     uri: api_url+'/answer',
     method: 'POST',
@@ -82,7 +82,7 @@ function Answer(uid, question, ans) {
     },
   }, (error, response, body) => {
     if (!error && response.statusCode == 200) {
-      // console.log(body);
+      return callback(body)
     }
   });
 }
