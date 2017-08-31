@@ -109,10 +109,11 @@ function execCommand(uid, cmd) {
         var questions = user.questionStatus
         var point = user.point
         var order = user.order
+        var total = user.total
         var msg = "uid: "+uid
                 +"\n名稱: "+nickname
                 +"\n分數: "+point
-                +"\n排名: "+order
+                +"\n排名: "+order+"/"+total
         reply(genMsgText(uid, msg), null);
       })
       break;
