@@ -34,7 +34,7 @@ function newUser(uid, callback) {
     request({
       uri: api_url+'/user',
       method: 'POST',
-      json: {'user': uid, 'nickname': nickname},
+      json: {'user': uid, 'platform': 'facebook', 'nickname': nickname},
     }, (error, response, body) => {
       // console.log(body)
       if (!error && response.statusCode == 200) {
