@@ -162,8 +162,8 @@ function getState(msging) {
 function sendAns(uid, question, ans, callback) {
   var msg;
   api.Answer(uid, question, ans, (result) => {
-    if(result) { msg = dialog.GetCorrect(); }
-    else { msg = dialog.GetWrong(); }
+    if(result) { msg = '😎 '+dialog.GetCorrect(); }
+    else { msg = '😩 '+dialog.GetWrong(); }
     // console.log(msg);
     reply(genMsgText(uid, msg), callback);
   });
