@@ -104,6 +104,7 @@ function execCommand(uid, cmd) {
       else
         var msg = "無法辨識範圍！"
       reply(genMsgText(uid, msg), null);
+      break
     case 'status':
       api.GetUser(uid, (user) => {
         // console.log(user)
@@ -119,10 +120,11 @@ function execCommand(uid, cmd) {
                 +"\n排名: "+order+"/"+total
         reply(genMsgText(uid, msg), null);
       })
-      break;
+      break
     case 'leaderboard':
       var msg = "http://leaderboard.ccns.ncku.edu.tw/"
       reply(genMsgText(uid, msg), null);
+      break
     default:
       reply(genMsgText(uid, '沒有這個指令唷'), null);
   }
