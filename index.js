@@ -85,7 +85,7 @@ app.listen(port, function () {
 function execCommand(uid, cmd) {
   switch(cmd[0]) {
     case 'help':
-      var msg = "/help\n- 顯示本列表\n/random\n- 隨機產生1-100的亂數\n/random m\n- 隨機產生1-m的亂數\n/random n m\n- 隨機產生n-m的亂數"
+      var msg = "/help\n- 顯示本列表\n/random\n- 隨機產生1-100的亂數\n/random m\n- 隨機產生1-m的亂數\n/random n m\n- 隨機產生n-m的亂數\nDiscord: https://discord.gg/CyVa5gG"
       if(quiz_online)
         msg += "\n/quiz\n- 開始猜謎遊戲\n/status\n- 顯示目前答題狀況\n/leaderboard\n- 顯示排行榜網址"
       reply(genMsgText(uid, msg), null);
