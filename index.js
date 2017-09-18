@@ -22,6 +22,13 @@ const STATE = {
   answer: 4,
 }
 
+const USER = {
+  unfinished: -1,
+  finished: 0,
+  allcorrect: 1,
+  allwrong: 2,
+}
+
 var question_cache = [];
 
 app.use(bodyParser.json())
@@ -113,6 +120,7 @@ function execCommand(uid, cmd) {
     case 'status':
       api.GetUser(uid, (user) => {
         // console.log(user)
+        console.log(user.questionStatus.reduce((s, v)=>s+(v==0),0))
         var uid = user.name
         var nickname = typeof user.nickname == 'undefined' ? 'Anonymous (未設定暱稱)' : user.nickname
         var questions = user.questionStatus
@@ -172,13 +180,33 @@ function sendAns(uid, question, ans, callback) {
     if(result) { msg = '😎 '+dialog.GetCorrect(); }
     else { msg = '😩 '+dialog.GetWrong(); }
     // console.log(msg);
-    reply(genMsgText(uid, msg), callback);
+    reply(genMsgText(uid, msg), ()=> {
+      if(question.id == 'finish') {
+        msg = dialog.GetFinished()
+        reply(genMsgText(uid, msg), callback)
+      }
+      else callback()
+    });
   });
 }
 
-function checkAns(question, ans) {
+function checkAns(uid, ans) {
   if(ans != question.answer) return false;
   else return true;
+}
+
+function checkUser(uid, callback) {
+  api.GetUser(uid, (user) => {
+    var stat
+    var qStatus = user.questionStatus
+    var tot = qStatus.length
+    var sum = qStatus.reduce((a, b) => a + b, 0)
+    if (sum == tot*2) stat = USER.allcorrect
+    else if (sum == tot) stat = USER.allwrong
+    else if (sum > tot) stat = USER.finished
+    else stat = USER.unfinished
+    return callback(stat)
+  })
 }
 
 function getNewQuestion(uid, callback) {
@@ -253,7 +281,7 @@ function reply(messageData, callback) {
 function genQuestionReplies(uid, question, showHint) {
   var option = question.option;
   var hint = question.hint;
-  console.log("Hint: "+hint)
+  // console.log("Hint: "+hint)
   if (hint && showHint)
     return [
       {
