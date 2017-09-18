@@ -61,13 +61,18 @@ app.post('/', function(req, res) {
       var sp = payload.split('.')
       var qid = sp[1]
       var ans = sp[2]
-      getQuestion(qid, (question) => {
-        sendAns(uid, question, ans, ()=>{
-          getNewQuestion(uid, (question) => {
-            sendQuestion(uid, question);
+      if (ans != "hint")
+        getQuestion(qid, (question) => {
+          sendAns(uid, question, ans, ()=>{
+            getNewQuestion(uid, (question) => {
+              sendQuestion(uid, question);
+            })
           })
         })
-      })
+      else
+        getQuestion(qid, (question) => {
+          sendHint(uid, question);
+        })
       break
     case STATE.unknown:
       console.log('Error! State unknown!')
@@ -189,12 +194,19 @@ function getQuestion(qid, callback) {
 }
 
 function sendQuestion(uid, question) {
-  var quick_replies = genQuestionReplies(uid, question)
-  var msgTxt = question.question
+  var quick_replies = genQuestionReplies(uid, question, true)
+  var msgTxt =  '[' + question.category + ']'
+                + '\n' + question.question
                 + '\nA: ' + question.option[0]
                 + '\nB: ' + question.option[1]
                 + '\nC: ' + question.option[2]
                 + '\nD: ' + question.option[3]
+  reply(genMsg(uid, msgTxt, quick_replies), null);
+}
+
+function sendHint(uid, question) {
+  var quick_replies = genQuestionReplies(uid, question, false)
+  var msgTxt = question.hint
   reply(genMsg(uid, msgTxt, quick_replies), null);
 }
 
@@ -238,38 +250,77 @@ function reply(messageData, callback) {
   })
 }
 
-function genQuestionReplies(uid, question) {
+function genQuestionReplies(uid, question, showHint) {
   var option = question.option;
-  return [
-    {
-      content_type: 'text',
-      // title: 'A: '+option[0],
-      // title: '（A）',
-      title: '- A -',
-      payload: 'answer.'+question.id+'.0'
-    },
-    {
-      content_type: 'text',
-      // title: 'B: '+option[1],
-      // title: '（B）',
-      title: '- B -',
-      payload: 'answer.'+question.id+'.1'
-    },
-    {
-      content_type: 'text',
-      // title: 'C: '+option[2],
-      // title: '（C）',
-      title: '- C -',
-      payload: 'answer.'+question.id+'.2'
-    },
-    {
-      content_type: 'text',
-      // title: 'D: '+option[3],
-      // title: '（D）',
-      title: '- D -',
-      payload: 'answer.'+question.id+'.3'
-    },
-  ];
+  var hint = question.hint;
+  console.log("Hint: "+hint)
+  if (hint && showHint)
+    return [
+      {
+        content_type: 'text',
+        // title: 'A: '+option[0],
+        // title: '（A）',
+        title: '- A -',
+        payload: 'answer.'+question.id+'.0'
+      },
+      {
+        content_type: 'text',
+        // title: 'B: '+option[1],
+        // title: '（B）',
+        title: '- B -',
+        payload: 'answer.'+question.id+'.1'
+      },
+      {
+        content_type: 'text',
+        // title: 'C: '+option[2],
+        // title: '（C）',
+        title: '- C -',
+        payload: 'answer.'+question.id+'.2'
+      },
+      {
+        content_type: 'text',
+        // title: 'D: '+option[3],
+        // title: '（D）',
+        title: '- D -',
+        payload: 'answer.'+question.id+'.3'
+      },
+      {
+        content_type: 'text',
+        title: '- Hint -',
+        payload: 'answer.'+question.id+'.hint'
+      },
+    ];
+  else
+    return [
+      {
+        content_type: 'text',
+        // title: 'A: '+option[0],
+        // title: '（A）',
+        title: '- A -',
+        payload: 'answer.'+question.id+'.0'
+      },
+      {
+        content_type: 'text',
+        // title: 'B: '+option[1],
+        // title: '（B）',
+        title: '- B -',
+        payload: 'answer.'+question.id+'.1'
+      },
+      {
+        content_type: 'text',
+        // title: 'C: '+option[2],
+        // title: '（C）',
+        title: '- C -',
+        payload: 'answer.'+question.id+'.2'
+      },
+      {
+        content_type: 'text',
+        // title: 'D: '+option[3],
+        // title: '（D）',
+        title: '- D -',
+        payload: 'answer.'+question.id+'.3'
+      },
+    ];
 }
 
 function isundefine(v) { return (typeof v == 'undefined') }
