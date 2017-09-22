@@ -3,5 +3,6 @@
   "page_token": "<PAGE_TOKEN>",
   "api_url": "<API_URL>",
   "quiz_online": "<true/false>",
-  "append_info": "<APPEND_INFO>"
+  "append_info": "<APPEND_INFO>",
+  "append_info2": "<APPEND_INFO2>"
 }
