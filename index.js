@@ -99,7 +99,7 @@ app.listen(port, function () {
 function execCommand(uid, cmd) {
   switch(cmd[0]) {
     case 'help':
-      var msg = "/help\n- 顯示本列表"
+      var msg = "/help\n- 顯示本列表\n/random n\n- 產生一個小於n的亂數\n/sleep\n- 睡個"
       if(quiz_online)
         msg += "\n/quiz\n- 開始猜謎遊戲\n/status\n- 顯示目前答題狀況\n/leaderboard\n- 顯示排行榜網址"
       msg += "\n"+append_info
@@ -140,6 +140,14 @@ function execCommand(uid, cmd) {
       break
     case 'leaderboard':
       var msg = "http://leaderboard.ccns.ncku.edu.tw/"
+      reply(genMsgText(uid, msg), null);
+      break
+    case 'sleep':
+      var msg = "Zzzzz..."
+      reply(genMsgText(uid, msg), null);
+      break
+    case 'fuck':
+      var msg = "不可以罵髒話喔"
       reply(genMsgText(uid, msg), null);
       break
     default:
