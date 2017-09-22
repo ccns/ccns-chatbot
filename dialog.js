@@ -17,17 +17,17 @@ function GetWrong() {
 }
 
 function GetFinished() {
-  var idx = Math.floor(Math.random()*(correct_msg.length-1))
+  var idx = Math.floor(Math.random()*(finished_msg.length-1))
   return finished_msg[idx]
 }
 
 function GetAllcorrect() {
-  var idx = Math.floor(Math.random()*(correct_msg.length-1))
+  var idx = Math.floor(Math.random()*(allcorrect_msg.length-1))
   return allcorrect_msg[idx]
 }
 
 function GetAllwrong() {
-  var idx = Math.floor(Math.random()*(wrong_msg.length-1))
+  var idx = Math.floor(Math.random()*(allwrong_msg.length-1))
   return allwrong_msg[idx]
 }
 
