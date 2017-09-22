@@ -12,6 +12,7 @@ const verify_token = process.env.VERIFY_TOKEN || config.get('verify_token')
 const page_token = process.env.PAGE_TOKEN || config.get('page_token')
 
 const quiz_online = (process.env.QUIZ_ONLINE || config.get('quiz_online')) == 'true'
+const append_info = (process.env.APPEND_INFO || config.get('append_info'))
 
 const STATE = {
   unknown: -1,
@@ -97,9 +98,10 @@ app.listen(port, function () {
 function execCommand(uid, cmd) {
   switch(cmd[0]) {
     case 'help':
-      var msg = "/help\n- 顯示本列表\n/random\n- 隨機產生1-100的亂數\n/random m\n- 隨機產生1-m的亂數\n/random n m\n- 隨機產生n-m的亂數\nDiscord: https://discord.gg/CyVa5gG"
+      var msg = "/help\n- 顯示本列表\n/random\n- 隨機產生1-100的亂數\n/random m\n- 隨機產生1-m的亂數\n/random n m\n- 隨機產生n-m的亂數"
       if(quiz_online)
         msg += "\n/quiz\n- 開始猜謎遊戲\n/status\n- 顯示目前答題狀況\n/leaderboard\n- 顯示排行榜網址"
+      msg += "\n"+append_info
       reply(genMsgText(uid, msg), null);
       break
     case 'quiz':
