@@ -32,9 +32,9 @@ const USER = {
 }
 
 const sleep_msg = [
-  "Zzzz..",
+  "!!?!(驚醒",
   "Zzz",
-  "!!?!(驚醒"
+  "Zzzz.."
 ]
 
 var sleeper = {};
