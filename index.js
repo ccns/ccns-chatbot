@@ -113,7 +113,7 @@ function execCommand(uid, cmd) {
       case 'help':
         var msg = "/help\n- 顯示本列表\n/random n\n- 產生一個小於n的亂數\n/sleep\n- 睡個\n"
         if(quiz_online)
-          msg += "\n[社博活動]\n/quiz\n- 開始猜謎遊戲\n/status\n- 顯示目前答題狀況\n/leaderboard\n- 顯示排行榜網址\n"
+          msg += "\n[社博活動]\n/quiz\n- 開始答題遊戲\n/status\n- 顯示目前答題狀況\n/leaderboard\n- 顯示排行榜網址\n"
         msg += "\n"+append_info
         msg += "\n"+append_info2
         reply(genMsgText(uid, msg), null);
