@@ -31,6 +31,13 @@ const USER = {
   allwrong: 2,
 }
 
+const sleep_msg = [
+  "Zzzz..",
+  "Zzz",
+  "!!?!(驚醒"
+]
+
+var sleeper = {};
 var question_cache = [];
 
 app.use(bodyParser.json())
@@ -97,61 +104,68 @@ app.listen(port, function () {
 })
 
 function execCommand(uid, cmd) {
-  switch(cmd[0]) {
-    case 'help':
-      var msg = "/help\n- 顯示本列表\n/random n\n- 產生一個小於n的亂數\n/sleep\n- 睡個"
-      if(quiz_online)
-        msg += "\n/quiz\n- 開始猜謎遊戲\n/status\n- 顯示目前答題狀況\n/leaderboard\n- 顯示排行榜網址"
-      msg += "\n"+append_info
-      msg += "\n"+append_info2
-      reply(genMsgText(uid, msg), null);
-      break
-    case 'quiz':
-      api.GetUser(uid, (user) => {
-        getNewQuestion(uid, (question) => {
-          sendQuestion(uid, question);
-        });
-      })
-      break
-    case 'random':
-      var rand = getRandomNum(cmd);
-      if(rand)
-        var msg = "產生亂數: "+rand
-      else
-        var msg = "無法辨識範圍！"
-      reply(genMsgText(uid, msg), null);
-      break
-    case 'status':
-      api.GetUser(uid, (user) => {
-        // console.log(user)
-        console.log(user.questionStatus.reduce((s, v)=>s+(v==0),0))
-        var uid = user.name
-        var nickname = typeof user.nickname == 'undefined' ? 'Anonymous (未設定暱稱)' : user.nickname
-        var questions = user.questionStatus
-        var point = user.point
-        var order = user.order
-        var total = user.total
-        var msg = "uid: "+uid
-                +"\n名稱: "+nickname
-                +"\n分數: "+point
-                +"\n排名: "+order+"/"+total
+  if (sleeper[uid]) {
+    var msg = sleep_msg[sleeper[uid]];
+    sleeper[uid]--;
+    reply(genMsgText(uid, msg), null);
+  } else {
+    switch(cmd[0]) {
+      case 'help':
+        var msg = "/help\n- 顯示本列表\n/random n\n- 產生一個小於n的亂數\n/sleep\n- 睡個\n"
+        if(quiz_online)
+          msg += "\n[社博活動]\n/quiz\n- 開始猜謎遊戲\n/status\n- 顯示目前答題狀況\n/leaderboard\n- 顯示排行榜網址\n"
+        msg += "\n"+append_info
+        msg += "\n"+append_info2
         reply(genMsgText(uid, msg), null);
-      })
-      break
-    case 'leaderboard':
-      var msg = "http://leaderboard.ccns.ncku.edu.tw/"
-      reply(genMsgText(uid, msg), null);
-      break
-    case 'sleep':
-      var msg = "Zzzzz..."
-      reply(genMsgText(uid, msg), null);
-      break
-    case 'fuck':
-      var msg = "不可以罵髒話喔"
-      reply(genMsgText(uid, msg), null);
-      break
-    default:
-      reply(genMsgText(uid, '沒有這個指令唷'), null);
+        break
+      case 'quiz':
+        api.GetUser(uid, (user) => {
+          getNewQuestion(uid, (question) => {
+            sendQuestion(uid, question);
+          });
+        })
+        break
+      case 'random':
+        var rand = getRandomNum(cmd);
+        if(rand)
+          var msg = "產生亂數: "+rand
+        else
+          var msg = "無法辨識範圍！"
+        reply(genMsgText(uid, msg), null);
+        break
+      case 'status':
+        api.GetUser(uid, (user) => {
+          // console.log(user)
+          console.log(user.questionStatus.reduce((s, v)=>s+(v==0),0))
+          var uid = user.name
+          var nickname = typeof user.nickname == 'undefined' ? 'Anonymous (未設定暱稱)' : user.nickname
+          var questions = user.questionStatus
+          var point = user.point
+          var order = user.order
+          var total = user.total
+          var msg = "uid: "+uid
+                  +"\n名稱: "+nickname
+                  +"\n分數: "+point
+                  +"\n排名: "+order+"/"+total
+          reply(genMsgText(uid, msg), null);
+        })
+        break
+      case 'leaderboard':
+        var msg = "http://leaderboard.ccns.ncku.edu.tw/"
+        reply(genMsgText(uid, msg), null);
+        break
+      case 'sleep':
+        var msg = "Zzzzz..."
+        sleeper[uid] = 3;
+        reply(genMsgText(uid, msg), null);
+        break
+      case 'fuck':
+        var msg = "不可以罵髒話喔"
+        reply(genMsgText(uid, msg), null);
+        break
+      default:
+        reply(genMsgText(uid, '沒有這個指令唷'), null);
+    }
   }
 }
 
