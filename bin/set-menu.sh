@@ -11,6 +11,12 @@ curl -X POST -H "Content-Type: application/json" -d '{
           "title":"查看可用指令 /help",
           "payload":"menu.help",
           "webview_height_ratio":"full"
+        },
+        {
+          "type":"postback",
+          "title":"開始答題遊戲 /quiz",
+          "payload":"menu.quiz",
+          "webview_height_ratio":"full"
         }
       ]
     },
