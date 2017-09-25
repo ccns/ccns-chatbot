@@ -105,7 +105,7 @@ app.listen(port, function () {
 
 function execCommand(uid, cmd) {
   if (sleeper[uid]) {
-    var msg = sleep_msg[sleeper[uid]];
+    var msg = sleep_msg[sleeper[uid]-1];
     sleeper[uid]--;
     reply(genMsgText(uid, msg), null);
   } else {
