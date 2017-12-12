@@ -9,6 +9,12 @@
           "title":"查看可用指令 /help",
           "payload":"menu.help",
           "webview_height_ratio":"full"
+        },
+        {
+          "type":"postback",
+          "title":"查看聊天室連結 /chatroom",
+          "payload":"menu.chatroom",
+          "webview_height_ratio":"full"
         }
       ]
     },
