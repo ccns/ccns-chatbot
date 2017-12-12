@@ -84,7 +84,8 @@ function execCommand(uid, cmd) {
     switch(cmd[0]) {
       case 'help':
         var msg = dialog.GetHelp()
-        if (append_info != 'none')
+          console.log(append_info)
+        if (append_info !== 'none')
           msg += "\n"+append_info
         reply(genMsgText(uid, msg), null);
         break
