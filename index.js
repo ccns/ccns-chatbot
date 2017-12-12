@@ -11,7 +11,7 @@ const port = process.env.PORT || 9487;
 const verify_token = process.env.VERIFY_TOKEN || config.get('verify_token')
 const page_token = process.env.PAGE_TOKEN || config.get('page_token')
 
-const append_info = (process.env.APPEND_INFO || config.get('append_info'))
+const append_info = process.env.APPEND_INFO || config.get('append_info')
 
 const STATE = {
   unknown: -1,
@@ -84,9 +84,9 @@ function execCommand(uid, cmd) {
     switch(cmd[0]) {
       case 'help':
         var msg = dialog.GetHelp()
-          console.log(append_info)
         if (append_info !== 'none')
           msg += "\n"+append_info
+        console.log(msg)
         reply(genMsgText(uid, msg), null);
         break
       case 'random':
