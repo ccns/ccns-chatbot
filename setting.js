@@ -1,6 +1,7 @@
 const request = require('request')
 const config = require('config')
 const fs = require("fs")
+const path = require("path");
 
 const page_token = process.env.PAGE_TOKEN || config.get('page_token')
 
@@ -9,9 +10,9 @@ const greeting_uri = "https://graph.facebook.com/v2.6/me/thread_settings?access_
 const menu_uri = "https://graph.facebook.com/v2.6/me/messenger_profile?access_token="
 
 const setting_dir = "setting/"
-var getstart_body = fs.readFileSync(setting_dir+"getstart.txt")
-var greeting_body = fs.readFileSync(setting_dir+"greeting.txt")
-var menu_body = fs.readFileSync(setting_dir+"menu.txt")
+var getstart_body = fs.readFileSync(path.join(process.cwd(), setting_dir+"getstart.txt"))
+var greeting_body = fs.readFileSync(path.join(process.cwd(), setting_dir+"greeting.txt"))
+var menu_body = fs.readFileSync(path.join(process.cwd(), setting_dir+"menu.txt"))
 
 function sendRequest(uri, body, callback) {
   request({
