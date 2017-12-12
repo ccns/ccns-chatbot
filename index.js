@@ -84,7 +84,8 @@ function execCommand(uid, cmd) {
     switch(cmd[0]) {
       case 'help':
         var msg = dialog.GetHelp()
-        msg += "\n"+append_info
+        if (append_info)
+          msg += "\n"+append_info
         reply(genMsgText(uid, msg), null);
         break
       case 'random':
