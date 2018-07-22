@@ -2,4 +2,5 @@
   "verify_token": "<VERIFY_TOKEN>",
   "page_token": "<PAGE_TOKEN>",
   "append_info": "<APPEND_INFO>",
+  "elasticsearch_host": "<ES_HOST>"
 }
