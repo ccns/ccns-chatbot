@@ -21,7 +21,7 @@ module.exports = class CourseListMessage extends Message {
             ]
             return t.join(' / ')
         })
-        console.log(columns)
+        // console.log(columns)
         text += columns.join('\n\n')
         return Messenger.createText(text)
     }
