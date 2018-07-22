@@ -5,6 +5,10 @@ const axios = require('axios')
 const config = require('config')
 const dialog = require('./dialog')
 const setting = require('./setting')
+const course = require('./course')
+
+const TextMessage = require('./message/TextMessage')
+const CourseListMessage = require('./message/CourseListMessage')
 
 const port = process.env.PORT || 9487;
 
@@ -33,7 +37,7 @@ var question_cache = [];
 app.use(bodyParser.json())
 
 // For init auth
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
     if(req.query['hub.verify_token'] == verify_token)
         res.send(req.query['hub.challenge'])
     else
@@ -42,83 +46,117 @@ app.get('/', function (req, res) {
 
 // Webhook
 app.post('/', async (req, res) => {
-    var msging = req.body.entry[0].messaging[0];
+    let msging = req.body.entry[0].messaging[0];
     // console.log(msging);
 
-    var senderId = msging.sender.id;
-    var recipientId = msging.recipient.id;
+    let senderId = msging.sender.id;
+    let recipientId = msging.recipient.id;
 
-    var uid = senderId;
-    switch(getState(msging)) {
-        case STATE.getstart:
-            var msg = dialog.GetWelcome()
-            await reply(genMsgText(uid, msg));
-            break
-        case STATE.command:
-            var text = msging.message.text
-            var cmd = text.substr(1).split(' ')
-            execCommand(uid, cmd)
-            break
-        case STATE.menu:
-            var payload = msging.postback.payload
-            var cmd = payload.split('.')[1].split(' ')
-            execCommand(uid, cmd)
-            break
-        case STATE.unknown:
-            console.log('Error! State unknown!')
-            console.log(msging)
-            break
+    let state = getState(msging)
+    if (state != STATE.plaintext) {
+        let uid = senderId
+        let msg
+        switch(state) {
+            case STATE.getstart:
+                msg = new TextMessage(dialog.GetWelcome())
+                break
+            case STATE.command:
+                var text = msging.message.text
+                var cmd = text.substr(1).split(' ')
+                try {
+                    msg = await execCommand(uid, cmd)
+                }
+                catch(err) {
+                    msg = new TextMessage('有東西壞掉啦Q_Q')
+                    console.trace(err)
+                }
+                break
+            case STATE.menu:
+                var payload = msging.postback.payload
+                var cmd = payload.split('.')[1].split(' ')
+                msg = await execCommand(uid, cmd)
+                break
+            case STATE.unknown:
+                msg = new TextMessage('有東西壞掉啦Q_Q')
+                console.log('Error! State unknown!')
+                console.log(msging)
+                break
+        }
+
+        try {
+            reply(uid, msg.toMessengerMessage())
+        }
+        catch(err) {
+            console.trace(err)
+        }
     }
+
 
     res.sendStatus(200);
 })
 
-app.listen(port, function () {
+app.listen(port, () => {
     console.log('Example app listening on port '+port+'!')
 })
 
 async function execCommand(uid, cmd) {
+    let msg
     if (sleeper[uid]) {
-        var msg = sleep_msg[sleeper[uid]-1];
+        msg = new TextMessage(sleep_msg[sleeper[uid]-1]);
         sleeper[uid]--;
-        await reply(genMsgText(uid, msg));
     } else {
+        var text
         switch(cmd[0]) {
             case 'help':
-                var msg = dialog.GetHelp()
+                text = dialog.GetHelp()
                 if (append_info !== 'none')
-                    msg += "\n"+append_info
-                await reply(genMsgText(uid, msg));
+                    text += "\n"+append_info
+                msg = new TextMessage(text)
                 break
             case 'random':
                 var rand = getRandomNum(cmd);
                 if(rand)
-                    var msg = "產生亂數: "+rand
+                    text = "產生亂數: "+rand
                 else
-                    var msg = "無法辨識範圍！"
-                await reply(genMsgText(uid, msg));
+                    text = "無法辨識範圍！"
+                msg = new TextMessage(text)
                 break
             case 'sleep':
-                var msg = "Zzzzz..."
+                msg = new TextMessage("Zzzzz...")
                 sleeper[uid] = 3;
-                await reply(genMsgText(uid, msg));
                 break
             case 'chatroom':
-                var msg = dialog.GetChatroom()
-                await reply(genMsgText(uid, msg));
+                msg = new TextMessage(dialog.GetChatroom())
                 break
             case 'setting':
-                var msg = await setting.Exec(cmd[1])
-                await reply(genMsgText(uid, msg));
+                msg = new TextMessage(await setting.Exec(cmd[1]))
                 break
             case 'fuck':
-                var msg = "不可以罵髒話喔"
-                await reply(genMsgText(uid, msg));
+                msg = new TextMessage("不可以罵髒話喔")
+                break
+            case 'course':
+                if (cmd[1]) {
+                    let courseList
+                    if (course.isDeptNo(cmd[1])) {
+                        let dept_no = cmd[1]
+                        let query_string = cmd.slice(2).join(' ')
+                        courseList = await course.query(query_string, dept_no)
+                    }
+                    else {
+                        let query_string = cmd.slice(1).join(' ')
+                        courseList = await course.query(query_string)
+                    }
+                    // console.log(courseList.length)
+                    msg = new CourseListMessage(courseList)
+                }
+                else
+                    msg = new TextMessage('請輸入查詢關鍵字')
                 break
             default:
-                await reply(genMsgText(uid, '沒有這個指令唷'));
+                msg = new TextMessage('沒有這個指令唷')
         }
     }
+    return msg
 }
 
 function getState(msging) {
@@ -154,40 +192,37 @@ function getState(msging) {
     return STATE.unknown
 }
 
-function genMsg(recipientId, msgTxt, quick_replies) {
+function genMsg(recipientId, msg) {
     return {
         recipient: { id: recipientId },
-        message: {
-            text: msgTxt,
-            quick_replies: quick_replies
-        }
+        message: msg
     };
 }
 
-function genMsgText(recipientId, msgTxt) {
-    return {
-        recipient: { id: recipientId },
-        message: { text: msgTxt, }
-    };
+function genTextMsg(msgTxt, quick_replies) {
+    let msg = {}
+    msg.text = msgTxt
+    if (quick_replies)
+        msg.quick_replies = quick_replies
+    return msg
 }
 
-async function reply(messageData) {
-    // console.log(messageData);
+async function reply(recipientId, msg) {
+    // console.log(recipientId, msg);
     try {
         const res = await axios({
             url: 'https://graph.facebook.com/v2.6/me/messages',
             method: 'POST',
             params: { access_token: page_token },
-            data: messageData
+            data: genMsg(recipientId, msg)
         })
-        const body = res.data
-        const recipientId = body.recipient_id
-        const messageId = body.message_id
+        var body = res.data
+        var messageId = body.message_id
 
         console.log("Successfully sent generic message with id %s to recipient %s", messageId, recipientId)
     }
     catch(err) {
-        console.log(err)
+        console.trace(err)
     }
 }
 
