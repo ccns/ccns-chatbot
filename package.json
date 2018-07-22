@@ -17,9 +17,10 @@
   },
   "homepage": "https://github.com/ccns/quiz-chatbot-fb#readme",
   "dependencies": {
-    "body-parser": "^1.17.2",
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
     "config": "^1.26.2",
-    "express": "^4.15.4",
-    "request": "^2.81.0"
+    "express": "^4.16.3",
+    "nodemon": "^1.18.3"
   }
 }

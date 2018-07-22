@@ -1,4 +1,4 @@
-const request = require('request')
+const axios = require('axios')
 const config = require('config')
 const fs = require("fs")
 
@@ -13,35 +13,30 @@ var getstart_body = fs.readFileSync(setting_dir+"getstart.txt").toString()
 var greeting_body = fs.readFileSync(setting_dir+"greeting.txt").toString()
 var menu_body = fs.readFileSync(setting_dir+"menu.txt").toString()
 
-function sendRequest(uri, body, callback) {
-  request({
-    uri: uri+page_token,
+async function sendRequest(uri, data) {
+  const res = await axios({
+    url: uri+page_token,
     method: "POST",
-    body: body,
+    data: data,
     headers: { "Content-Type": "application/json" },
-  }, (error, response, body) => {
-    if (!error && response.statusCode == 200) {
-      return callback(body);
-    }
   })
+  return res.data
 }
 
 module.exports = {
-  Exec: (cmd) => {
-    return new Promise(function (resolve, reject) {
+  Exec: async (cmd) => {
       switch (cmd) {
         case 'getstart':
-          sendRequest(getstart_uri, getstart_body, resolve)
+          return sendRequest(getstart_uri, getstart_body)
           break
         case 'greeting':
-          sendRequest(greeting_uri, greeting_body, resolve)
+          return sendRequest(greeting_uri, greeting_body)
           break
         case 'menu':
-          sendRequest(menu_uri, menu_body, resolve)
+          return sendRequest(menu_uri, menu_body)
           break
         default:
-          resolve('Setting not found.')
+          throw new Error('Setting not found.')
       }
-    })
   }
 }
