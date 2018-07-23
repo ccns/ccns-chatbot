@@ -18,6 +18,12 @@ const page_token = process.env.PAGE_TOKEN || config.get('page_token')
 const append_info = process.env.APPEND_INFO || config.get('append_info')
 
 const STATE = {
+    idle: 0,
+    sleeping: 1,
+    courseQueryWait: 2,
+}
+
+const ACTION = {
     unknown: -1,
     getstart: 0,
     plaintext: 1,
@@ -32,6 +38,7 @@ const sleep_msg = [
 ]
 
 var sleeper = {};
+var user_state = {};
 var question_cache = [];
 
 app.use(bodyParser.json())
@@ -46,49 +53,76 @@ app.get('/', (req, res) => {
 
 // Webhook
 app.post('/', async (req, res) => {
-    let msging = req.body.entry[0].messaging[0];
-    // console.log(msging);
+    let msging = req.body.entry[0].messaging[0]
+    // console.log(msging)
 
-    let senderId = msging.sender.id;
-    let recipientId = msging.recipient.id;
+    let senderId = msging.sender.id
+    let recipientId = msging.recipient.id
+    let uid = senderId
 
-    let state = getState(msging)
-    if (state != STATE.plaintext) {
-        let uid = senderId
-        let msg
-        switch(state) {
-            case STATE.getstart:
-                msg = new TextMessage(dialog.GetWelcome())
-                break
-            case STATE.command:
-                var text = msging.message.text
-                var cmd = text.substr(1).split(' ')
-                try {
+    if (user_state[uid] === undefined)
+        user_state[uid] = STATE.idle
+
+    let action = getAction(msging)
+    let msg
+    switch(user_state[uid]) {
+        case STATE.idle:
+            switch(action) {
+                case ACTION.getstart:
+                    msg = new TextMessage(dialog.GetWelcome())
+                    break
+                case ACTION.command:
+                    var text = msging.message.text
+                    var cmd = text.substr(1).split(' ')
+                    try {
+                        msg = await execCommand(uid, cmd)
+                    }
+                    catch(err) {
+                        msg = new TextMessage('有東西壞掉啦Q_Q')
+                        console.trace(err)
+                        user_state[uid] = STATE.idle
+                    }
+                    break
+                case ACTION.menu:
+                    var payload = msging.postback.payload
+                    var cmd = payload.split('.')[1].split(' ')
                     msg = await execCommand(uid, cmd)
-                }
-                catch(err) {
+                    break
+                case ACTION.unknown:
                     msg = new TextMessage('有東西壞掉啦Q_Q')
-                    console.trace(err)
-                }
-                break
-            case STATE.menu:
-                var payload = msging.postback.payload
-                var cmd = payload.split('.')[1].split(' ')
+                    console.log('Error! Action unknown!')
+                    console.log(msging)
+                    user_state[uid] = STATE.idle
+                    break
+            }
+            break
+        case STATE.sleeping:
+            msg = new TextMessage(sleep_msg[sleeper[uid]-1]);
+            sleeper[uid]--;
+            if (sleeper[uid] == 0)
+                user_state[uid] = STATE.idle;
+            break
+        case STATE.courseQueryWait:
+            var text = msging.message.text
+            var cmd = text.substr(0).split(' ')
+            cmd.unshift('course')
+            try {
                 msg = await execCommand(uid, cmd)
-                break
-            case STATE.unknown:
+            }
+            catch(err) {
                 msg = new TextMessage('有東西壞掉啦Q_Q')
-                console.log('Error! State unknown!')
-                console.log(msging)
-                break
-        }
+                console.trace(err)
+                user_state[uid] = STATE.idle
+            }
+            break
+    }
 
-        try {
+    try {
+        if (msg !== undefined)
             reply(uid, msg.toMessengerMessage())
-        }
-        catch(err) {
-            console.trace(err)
-        }
+    }
+    catch(err) {
+        console.trace(err)
     }
 
 
@@ -101,41 +135,41 @@ app.listen(port, () => {
 
 async function execCommand(uid, cmd) {
     let msg
-    if (sleeper[uid]) {
-        msg = new TextMessage(sleep_msg[sleeper[uid]-1]);
-        sleeper[uid]--;
-    } else {
-        var text
-        switch(cmd[0]) {
-            case 'help':
-                text = dialog.GetHelp()
-                if (append_info !== 'none')
-                    text += "\n"+append_info
-                msg = new TextMessage(text)
-                break
-            case 'random':
-                var rand = getRandomNum(cmd);
-                if(rand)
-                    text = "產生亂數: "+rand
-                else
-                    text = "無法辨識範圍！"
-                msg = new TextMessage(text)
-                break
-            case 'sleep':
-                msg = new TextMessage("Zzzzz...")
-                sleeper[uid] = 3;
-                break
-            case 'chatroom':
-                msg = new TextMessage(dialog.GetChatroom())
-                break
-            case 'setting':
-                msg = new TextMessage(await setting.Exec(cmd[1]))
-                break
-            case 'fuck':
-                msg = new TextMessage("不可以罵髒話喔")
-                break
-            case 'course':
-                if (cmd[1]) {
+    var text
+    switch(cmd[0]) {
+        case 'help':
+            text = dialog.GetHelp()
+            if (append_info !== 'none')
+                text += "\n"+append_info
+            msg = new TextMessage(text)
+            break
+        case 'random':
+            var rand = getRandomNum(cmd);
+            if(rand)
+                text = "產生亂數: "+rand
+            else
+                text = "無法辨識範圍！"
+            msg = new TextMessage(text)
+            break
+        case 'sleep':
+            msg = new TextMessage("Zzzzz...")
+            sleeper[uid] = 3;
+            user_state[uid] = STATE.sleeping;
+            break
+        case 'chatroom':
+            msg = new TextMessage(dialog.GetChatroom())
+            break
+        case 'setting':
+            msg = new TextMessage(await setting.Exec(cmd[1]))
+            break
+        case 'fuck':
+            msg = new TextMessage("不可以罵髒話喔")
+            break
+        case 'course':
+            if (cmd[1]) {
+                if (cmd[1] === '88')
+                    msg = new TextMessage('取消查詢')
+                else {
                     let courseList
                     if (course.isDeptNo(cmd[1])) {
                         let dept_no = cmd[1]
@@ -149,25 +183,29 @@ async function execCommand(uid, cmd) {
                     // console.log(courseList.length)
                     msg = new CourseListMessage(courseList)
                 }
-                else
-                    msg = new TextMessage('請輸入查詢關鍵字')
-                break
-            default:
-                msg = new TextMessage('沒有這個指令唷')
-        }
+                user_state[uid] = STATE.idle
+            }
+            else {
+                msg = new TextMessage('請輸入查詢關鍵字，ex: 機動學，若要取消查詢請輸入 88')
+                user_state[uid] = STATE.courseQueryWait
+            }
+            break
+        default:
+            msg = new TextMessage('沒有這個指令唷')
+            user_state[uid] = STATE.idle
     }
     return msg
 }
 
-function getState(msging) {
+function getAction(msging) {
     if(msging.postback) {
         // From postback
         var sp = msging.postback.payload.split('.')
         switch(sp[0]) {
             case 'getstart':
-                return STATE.getstart
+                return ACTION.getstart
             case 'menu':
-                return STATE.menu
+                return ACTION.menu
         }
     } else if (msging.message) {
         var msg = msging.message;
@@ -182,14 +220,14 @@ function getState(msging) {
             var msgTxt = msging.message.text
             if(msgTxt)
                 if(msgTxt[0]=='/')
-                    return STATE.command
+                    return ACTION.command
             else
-                return STATE.plaintext
+                return ACTION.plaintext
             else
-                return STATE.sticker
+                return ACTION.sticker
         }
     }
-    return STATE.unknown
+    return ACTION.unknown
 }
 
 function genMsg(recipientId, msg) {
