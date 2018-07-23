@@ -9,4 +9,6 @@
 /course [系所代碼] 查詢字串
 - 查詢課程，可指定系所代碼
 
+或使用左下角的選單
+
 Discord: https://discord.gg/ktSHKSq

@@ -186,7 +186,7 @@ async function execCommand(uid, cmd) {
                 user_state[uid] = STATE.idle
             }
             else {
-                msg = new TextMessage('請輸入查詢關鍵字，ex: 機動學，若要取消查詢請輸入 88')
+                msg = new TextMessage('請輸入查詢關鍵字，可輸入課程名稱、老師名字、課程代碼，ex: 機動學，若要取消查詢請輸入 88')
                 user_state[uid] = STATE.courseQueryWait
             }
             break

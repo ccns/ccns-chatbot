@@ -15,6 +15,12 @@
           "title":"查看聊天室連結 /chatroom",
           "payload":"menu.chatroom",
           "webview_height_ratio":"full"
+        },
+        {
+          "type":"postback",
+          "title":"查詢課程 /course",
+          "payload":"menu.course",
+          "webview_height_ratio":"full"
         }
       ]
     },
