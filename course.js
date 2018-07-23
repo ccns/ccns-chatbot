@@ -24,8 +24,8 @@ async function query(q, dept) {
         bool.should = [];
         bool.should.push({bool: course_code_bool});
         bool.should.push({match: {name: {query: q, boost: 8}}});
-        bool.should.push({match: {dept_name: {query: q, boost: 4}}});
-        bool.should.push({match: {teacher: {query: q, boost: 2}}});
+        bool.should.push({match: {teacher: {query: q, boost: 4}}});
+        bool.should.push({match: {dept_name: {query: q, boost: 2}}});
         bool.should.push({match: {required: {query: q, boost: 1}}});
         query.bool = bool;
         obj.query = query;

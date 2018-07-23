@@ -14,29 +14,30 @@ var greeting_body = fs.readFileSync(setting_dir+"greeting.txt").toString()
 var menu_body = fs.readFileSync(setting_dir+"menu.txt").toString()
 
 async function sendRequest(uri, data) {
-  const res = await axios({
-    url: uri+page_token,
-    method: "POST",
-    data: data,
-    headers: { "Content-Type": "application/json" },
-  })
-  return res.data
+    const res = await axios({
+        url: uri+page_token,
+        method: "POST",
+        data: data,
+        headers: { "Content-Type": "application/json" },
+    })
+    return res.data
 }
 
 module.exports = {
-  Exec: async (cmd) => {
-      switch (cmd) {
-        case 'getstart':
-          return sendRequest(getstart_uri, getstart_body)
-          break
-        case 'greeting':
-          return sendRequest(greeting_uri, greeting_body)
-          break
-        case 'menu':
-          return sendRequest(menu_uri, menu_body)
-          break
-        default:
-          throw new Error('Setting not found.')
-      }
-  }
+    Exec: async (cmd) => {
+        var response
+        switch (cmd) {
+            case 'getstart':
+                res = await sendRequest(getstart_uri, getstart_body)
+                return res.result
+            case 'greeting':
+                res = await sendRequest(greeting_uri, greeting_body)
+                return res.result
+            case 'menu':
+                res = await sendRequest(menu_uri, menu_body)
+                return res.result
+            default:
+                return 'Setting not found.'
+        }
+    }
 }
