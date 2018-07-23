@@ -23,10 +23,16 @@ async function query(q, dept) {
 
         bool.should = [];
         bool.should.push({bool: course_code_bool});
-        bool.should.push({match: {name: {query: q, boost: 4}}});
-        bool.should.push({match: {teacher: {query: q, boost: 3}}});
-        bool.should.push({match: {dept_name: {query: q, boost: 2}}});
-        bool.should.push({match: {required: {query: q, boost: 1}}});
+        bool.should.push({
+            multi_match: {
+                query: q,
+                fields: ['name^4', 'teacher^3', 'dept_name^2', 'required']
+            }
+        })
+        // bool.should.push({match: {name: {query: q, boost: 4}}});
+        // bool.should.push({match: {teacher: {query: q, boost: 3}}});
+        // bool.should.push({match: {dept_name: {query: q, boost: 2}}});
+        // bool.should.push({match: {required: {query: q, boost: 1}}});
         query.bool = bool;
         obj.query = query;
         obj.size = 10;

@@ -8,7 +8,7 @@ module.exports = class CourseListMessage extends Message {
 
     // Override
     toMessengerMessage() {
-        let text = "No / 系所名稱 / 課程名稱 / 班級 / 授課老師 / 上課地點\n\n"
+        let text = ''
         const columns = this.data.map((el, idx) => {
             let d = el._source
             let t = [
@@ -21,8 +21,16 @@ module.exports = class CourseListMessage extends Message {
             ]
             return t.join(' / ')
         })
+
         // console.log(columns)
-        text += columns.join('\n\n')
+        if (columns.length > 0) {
+            text += "No / 系所名稱 / 課程名稱 / 班級 / 授課老師 / 上課地點\n\n"
+            text += columns.join('\n\n')
+        }
+        else
+            text += '嗚嗚找不到任何東西'
+
+        text += "\n================\nNCKU Course Query\nhttps://ncku-course-query.herokuapp.com/"
         return Messenger.createText(text)
     }
 }
