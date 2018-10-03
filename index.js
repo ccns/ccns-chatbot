@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const axios = require('axios')
+const request = require('request')
 const config = require('config')
 const dialog = require('./dialog')
 const setting = require('./setting')
@@ -33,6 +34,7 @@ const ACTION = {
 
 const sleep_msg = [
     "!!?!(驚醒",
+    "我在睡，別吵",
     "Zzz",
     "Zzzz.."
 ]
@@ -161,6 +163,12 @@ async function execCommand(uid, cmd) {
             } else {
                 text = n+" 太大啦，小一點好嗎"
             }
+        case 'anime':
+            var ani = await getRecommendAnime()
+            if(ani)
+                text = "RNG god 今天推薦你這部:\n" + ani
+            else
+                text = "Oops! 沒抽到 看來你今天手氣不好LoL"
             msg = new TextMessage(text)
             break
         case 'sleep':
@@ -318,3 +326,24 @@ function gcd(x, y) {
   }
   return x;
 }
+
+function getRecommendAnime() {
+  return new Promise((resolve, reject) => {
+    var options = {
+      url: 'https://anidb.net/perl-bin/animedb.pl?show=anime&do.random=1',
+      headers: {
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.6',
+          'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Mobile Safari/537.36',
+          'Cache-Control': 'max-age=0',
+          'Connection': 'keep-alive'
+      }
+    }
+    request(options, function (error, response, body) {
+      if(!error && response.statusCode == 200)
+        resolve(response.request.uri.href)
+      else
+        reject(undefined)
+    })
+  })
+};
