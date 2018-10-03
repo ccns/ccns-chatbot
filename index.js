@@ -33,6 +33,7 @@ const ACTION = {
 
 const sleep_msg = [
     "!!?!(驚醒",
+    "我在睡，別吵",
     "Zzz",
     "Zzzz.."
 ]
