@@ -288,8 +288,10 @@ function getRandomNum(cmd) {
 }
 
 function primality_test(n) {
-    if( n == 1 || n % 2 == 0 )
-        return false;
+    if( n == 1 || n % 2 == 0 ) {
+        if( n == 2 ) return true;
+        else return false;
+    }
 
     a = 1;
     b = (n - 1) / 2;
