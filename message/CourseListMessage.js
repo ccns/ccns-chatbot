@@ -30,7 +30,7 @@ module.exports = class CourseListMessage extends Message {
         else
             text += '嗚嗚找不到任何東西'
 
-        text += "\n================\nNCKU Course Query\nhttps://ncku-course-query.herokuapp.com/"
+        text += "\n================\nNCKU Course Query\nhttps://course.ncku.io"
         return Messenger.createText(text)
     }
 }
