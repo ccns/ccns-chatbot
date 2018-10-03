@@ -151,6 +151,18 @@ async function execCommand(uid, cmd) {
                 text = "無法辨識範圍！"
             msg = new TextMessage(text)
             break
+        case 'primality_test':
+            var n = parseInt(cmd[1])
+            if(n < 100000) {
+                if(primality_test(n))
+                    text = n+" 是個質數"
+                else
+                    text = n+" 不是質數唷"
+            } else {
+                text = n+" 太大啦，小一點好嗎"
+            }
+            msg = new TextMessage(text)
+            break
         case 'sleep':
             msg = new TextMessage("Zzzzz...")
             sleeper[uid] = 3;
@@ -273,4 +285,36 @@ function getRandomNum(cmd) {
         return 1+Math.floor(Math.random()*parseInt(cmd[1]))
     else
         return 1+Math.floor(Math.random()*100)
+}
+
+function primality_test(n) {
+    if( n == 1 || n % 2 == 0 ) {
+        if( n == 2 ) return true;
+        else return false;
+    }
+
+    a = 1;
+    b = (n - 1) / 2;
+    while( b > 0 ) {
+        if( gcd(a, b) != 1 ) return false;
+        a += 2;
+        b -= 1;
+    }
+
+    return true;
+}
+
+function gcd(x, y) {
+  if ((typeof x !== 'number') || (typeof y !== 'number'))
+    return false;
+
+  x = Math.abs(x);
+  y = Math.abs(y);
+
+  while(y) {
+    var t = y;
+    y = x % y;
+    x = t;
+  }
+  return x;
 }

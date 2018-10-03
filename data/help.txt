@@ -1,7 +1,9 @@
 /help
 - 顯示本列表
 /random n
-- 產生一個小於n的亂數
+- 產生一個小於 n 的亂數
+/primality_test n
+- 測試 n 是否是質數
 /sleep
 - 睡個
 /chatroom
