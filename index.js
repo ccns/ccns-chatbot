@@ -163,10 +163,12 @@ async function execCommand(uid, cmd) {
             } else {
                 text = n+" 太大啦，小一點好嗎"
             }
+            msg = new TextMessage(text)
+            break
         case 'anime':
             var ani = await getRecommendAnime()
             if(ani)
-                text = "RNG god 今天推薦你這部:\n" + ani
+                text = "RNGesus 今天推薦你這部:\n" + ani
             else
                 text = "Oops! 沒抽到 看來你今天手氣不好LoL"
             msg = new TextMessage(text)
