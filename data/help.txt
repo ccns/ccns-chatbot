@@ -6,6 +6,8 @@
 - 測試 n 是否是質數
 /sleep
 - 睡個
+/anime
+- 讓 RNGesus 幫你推薦動畫
 /chatroom
 - 顯示聊天室網址
 /course [系所代碼] 查詢字串
