@@ -178,6 +178,9 @@ async function execCommand(uid, cmd) {
             msg = new TextMessage("不可以罵髒話喔")
             break
         case 'course':
+            msg = new TextMessage('這個功能目前無法使用唷')
+            user_state[uid] = STATE.idle
+            break
             if (cmd[1]) {
                 if (cmd[1] === '88')
                     msg = new TextMessage('取消查詢')
