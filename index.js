@@ -173,6 +173,11 @@ async function execCommand(uid, cmd) {
                 text = "Oops! 沒抽到 看來你今天手氣不好LoL"
             msg = new TextMessage(text)
             break
+        case 'weather':
+            var wea = await getWeather()
+            text = "現在成大附近的天氣為 "+wea.weather.description+"，氣溫 "+wea.main.temp+"°C，相對溼度 "+wea.main.humidity+"%"
+            msg = new TextMessage(text)
+            break
         case 'sleep':
             msg = new TextMessage("Zzzzz...")
             sleeper[uid] = 3;
@@ -352,3 +357,24 @@ function getRecommendAnime() {
     })
   })
 };
+
+function getWeather() {
+    return new Promise((resolve, reject) => {
+      var options = {
+        url: 'http://api.openweathermap.org/data/2.5/weather?lat=22.99&lon=120.22&units=metric&appid=0c986b41ce4f0187ec5c7f83cb59783e',
+        headers: {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.6',
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Mobile Safari/537.36',
+            'Cache-Control': 'max-age=0',
+            'Connection': 'keep-alive'
+        }
+      }
+      request(options, function (error, response, body) {
+        if(!error && response.statusCode == 200)
+          resolve(body)
+        else
+          reject(undefined)
+      })
+    })
+}
