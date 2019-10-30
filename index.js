@@ -372,7 +372,7 @@ function getWeather() {
       }
       request(options, function (error, response, body) {
         if(!error && response.statusCode == 200)
-          resolve(body)
+          resolve(JSON.parse(body));
         else
           reject(undefined)
       })
