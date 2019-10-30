@@ -8,6 +8,8 @@
 - 睡個
 /anime
 - 讓 RNGesus 幫你推薦動畫
+/weather
+- 看看成大附近的天氣如何
 /chatroom
 - 顯示聊天室網址
 /course [系所代碼] 查詢字串

@@ -175,7 +175,7 @@ async function execCommand(uid, cmd) {
             break
         case 'weather':
             var wea = await getWeather()
-            text = "現在成大附近的天氣為 "+wea.weather.description+"，氣溫 "+wea.main.temp+"°C，相對溼度 "+wea.main.humidity+"%"
+            text = "現在成大附近的天氣為 "+wea.weather[0].description+"，氣溫 "+wea.main.temp+"°C，相對溼度 "+wea.main.humidity+"%"
             msg = new TextMessage(text)
             break
         case 'sleep':
@@ -361,7 +361,7 @@ function getRecommendAnime() {
 function getWeather() {
     return new Promise((resolve, reject) => {
       var options = {
-        url: 'http://api.openweathermap.org/data/2.5/weather?lat=22.99&lon=120.22&units=metric&appid=0c986b41ce4f0187ec5c7f83cb59783e',
+        url: 'http://api.openweathermap.org/data/2.5/weather?lat=22.99&lon=120.22&units=metric&lang=zh_tw&appid=0c986b41ce4f0187ec5c7f83cb59783e',
         headers: {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.6',
