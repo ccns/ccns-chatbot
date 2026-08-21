@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ccns/quiz-chatbot-fb#readme",
   "dependencies": {
+    "ajv": "^6.12.6",
     "axios": "^0.33.0",
     "body-parser": "^1.20.6",
     "config": "^1.26.2",
